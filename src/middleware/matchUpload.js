@@ -1,27 +1,14 @@
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { cloudinary } from '../config/cloudinary.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Asegurar que el directorio existe
-const uploadDir = path.join(__dirname, '../../uploads/matches');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'movie-match/matches', // Carpeta específica para matches
+        allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+        transformation: [{ width: 1920, height: 1080, crop: 'limit' }] // Max Full HD para fondos
     },
-    filename: (req, file, cb) => {
-        // Nombre único: timestamp-matchid-ext
-        // Nota: req.params.id puede no estar disponible aquí dependiendo de dónde se defina el middleware
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, 'match-bg-' + uniqueSuffix + path.extname(file.originalname));
-    }
 });
 
 const fileFilter = (req, file, cb) => {
@@ -37,6 +24,6 @@ export const matchUpload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
-        fileSize: 10 * 1024 * 1024 // 10MB max (larger for backgrounds)
+        fileSize: 10 * 1024 * 1024 // 10MB max
     }
 });

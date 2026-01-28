@@ -1,27 +1,9 @@
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
+import { storage } from '../config/cloudinary.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Asegurar que el directorio existe
-const uploadDir = path.join(__dirname, '../../uploads/profiles');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        // Nombre único: timestamp-userid-ext
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, 'profile-' + uniqueSuffix + path.extname(file.originalname));
-    }
-});
+// Si no hay credenciales de Cloudinary configuradas, se podría hacer fallback a disco,
+// pero para Render es mejor fallar o avisar que se necesita Cloudinary.
+// Por simplicidad, asumiremos que se configurará Cloudinary.
 
 const fileFilter = (req, file, cb) => {
     // Aceptar solo imágenes

@@ -84,18 +84,14 @@ export const updateProfile = async (req, res, next) => {
         // Manejar archivos subidos
         if (req.files) {
             if (req.files.profileImage) {
-                if (currentUser.profileImage) {
-                    deleteOldImage(currentUser.profileImage);
-                }
-                profileImageUrl = `${baseUrl}/uploads/profiles/${req.files.profileImage[0].filename}`;
-                console.log('New profileImageUrl:', profileImageUrl);
+                // Con Cloudinary, file.path contiene la URL segura
+                profileImageUrl = req.files.profileImage[0].path;
+                console.log('New profileImageUrl (Cloudinary):', profileImageUrl);
             }
             if (req.files.backgroundImage) {
-                if (currentUser.backgroundImage) {
-                    deleteOldImage(currentUser.backgroundImage);
-                }
-                backgroundImageUrl = `${baseUrl}/uploads/profiles/${req.files.backgroundImage[0].filename}`;
-                console.log('New backgroundImageUrl:', backgroundImageUrl);
+                // Con Cloudinary, file.path contiene la URL segura
+                backgroundImageUrl = req.files.backgroundImage[0].path;
+                console.log('New backgroundImageUrl (Cloudinary):', backgroundImageUrl);
             }
         } else if (req.file) {
             // Retrocompatibilidad por si acaso (aunque ahora usamos fields)
