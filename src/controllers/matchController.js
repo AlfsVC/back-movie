@@ -396,8 +396,8 @@ export const uploadBackground = async (req, res, next) => {
             return res.status(403).json({ error: 'No tienes acceso a este match' });
         }
 
-        // Eliminar imagen anterior si existe
-        if (match.backgroundImage) {
+        // Eliminar imagen anterior si existe (Solo si es local)
+        if (match.backgroundImage && match.backgroundImage.includes('/uploads/')) {
             const oldPath = match.backgroundImage.split('/uploads/')[1];
             if (oldPath) {
                 const fullPath = path.join(__dirname, '../../uploads', oldPath);
@@ -407,9 +407,8 @@ export const uploadBackground = async (req, res, next) => {
             }
         }
 
-        // Construir URL pública
-        // Asumiendo que req.file.filename es solo el nombre del archivo en uploads/matches
-        const imageUrl = `${req.protocol}://${req.get('host')}/uploads/matches/${req.file.filename}`;
+        // Cloudinary devuelve la URL en path
+        const imageUrl = req.file.path;
 
         const updatedMatch = await prisma.match.update({
             where: { id },
